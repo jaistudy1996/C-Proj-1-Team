@@ -203,10 +203,17 @@ void processSalerepFile( char * filename) {
 	}	
 
    char line[MAX_LINE_LENGHT];
+<<<<<<< HEAD
 
    long fileCurrentPosition = ftell(file);
+=======
+   int debug;
+   long fileCurrentPosition = ftell( file );
+>>>>>>> 6414850d2ff37584a9de517fdb4bd5db2801033a
 
    while ( fgets (line, MAX_LINE_LENGHT, file) !=NULL ) {
+        printf("DEBUG SALE %d\n", debug);
+        debug++;
 		printf("[%s] position [%ld]\n", line, fileCurrentPosition);
 		
 		const char separator[2] = ",";
@@ -244,6 +251,89 @@ void processSalerepFile( char * filename) {
 	fclose(file);
 }
 
+<<<<<<< HEAD
+=======
+void processTransactionFile(char * filename){
+    FILE *file;
+    file = fopen(filename, "r");
+    if (file == NULL){
+        printf("Error opening %s", filename);
+    }
+
+    const char separator[2] = ",";
+    char line[MAX_LINE_LENGHT];
+    long fileCurrentPosition = ftell( file );
+
+    while( fgets(line, MAX_LINE_LENGHT, file) != NULL){
+
+        char * token;
+        int tokenCount = 1;
+        int trxid, salerepid, transaction_type, amount;
+        struct transaction * trans = NULL;   // empty struct, will be reinitialized for each line.
+        struct salerep * salerep = NULL;
+        token = strtok(line, separator);   // first token
+
+        while(token != NULL){
+            switch(tokenCount){
+                case 1:
+                    trxid = atoi(token);
+                    trans->trxid = trxid;
+                    break;
+                case 2:
+                    salerepid = atoi(token);
+                    trans->salerepid = salerepid;
+                    salerep = findSalerep(salerepid);
+                    break;
+                case 3:
+                    transaction_type = atoi(token);
+                    trans->type = transaction_type;
+                    break;
+                case 4:
+                    amount = atoi(token);
+                    trans->amount = amount;
+                    break;
+            }
+            token = strtok(NULL, separator);
+            tokenCount++;
+        }
+
+        if(trans->type == 1){
+            territories->territoryid = salerep->territoryid;
+            territories->amount += trans->amount;
+            salerep->amount += trans->amount;
+        }
+        if(trans->type == 2){
+            territories->territoryid = salerep->territoryid;
+            territories->amount += trans->amount;
+            salerep->amount += (110 / 100) * (trans->amount);
+        }
+        if(trans->type == 3){
+            territories->territoryid = salerep->territoryid;
+            territories->amount -= trans->amount;
+            salerep->amount -= trans->amount;
+        }
+        if(trans->type == 4){
+            territories->territoryid = salerep->territoryid;
+            territories->amount -= trans->amount;
+            salerep->amount -= (125 / 100) * trans->amount;
+        }
+        if(trans->type == 5){
+            territories->territoryid = salerep->territoryid;
+            territories->amount -= trans->amount;
+        }
+        if(trans->type == 6){
+            territories->territoryid = salerep->territoryid;
+            territories->amount -= trans->amount;
+            salerep->amount -= (110 / 100) * trans->amount;
+        }
+        if(trans->type == 7){
+            territories->territoryid = salerep->territoryid;
+            salerep->amount += (75 / 100) * trans->amount;
+        }
+    }
+
+}
+>>>>>>> 6414850d2ff37584a9de517fdb4bd5db2801033a
 
 int main ( int arc, char *argv[] ) {
 	printf("step0 \n");
@@ -252,12 +342,19 @@ int main ( int arc, char *argv[] ) {
 	salereps    = (struct salerep *) malloc( sizeof(struct salerep) * structCount);
 	territories = (struct territory *) malloc( sizeof(struct territory) * structCount);
     
+    printf("DEBUG: 1\n");
+
 	for ( int x = 0 ; x < structCount ; x++ ) {
 		initSaleRep( x, &salereps[x] );
 		initTerritory( x, &territories[x] );
 	}
 
+<<<<<<< HEAD
 	printf("step1\n");
+=======
+    printf("DEBUG: 2\n");
+
+>>>>>>> 6414850d2ff37584a9de517fdb4bd5db2801033a
 	char * fileName = argv[2];
 	char * filename = argv[3];
 	printf("step2\n");
@@ -269,6 +366,7 @@ int main ( int arc, char *argv[] ) {
 	printf("step5\n");
 	
 
+    printf("DEBUG: 3\n");
 	
 	//update the salerep file with the new amount
 	FILE * file = fopen(argv[2], "r+b");
