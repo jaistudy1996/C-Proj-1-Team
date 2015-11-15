@@ -117,7 +117,6 @@ struct salerep * findSalerep( int salerepid ) {
 			return &salereps[x];
 		}
 	}
-
 	return NULL;
 }
 
@@ -187,44 +186,60 @@ void processSalerepFile( char * filename) {
 						 break;
 			}
 			token = strtok(NULL, separator);
-			
 			tokenCount++;
 		}
 		fileCurrentPosition = ftell( file );
 	}
-   
 	fclose(file);
+}
+
+void processTransactionFile(char * filename){
+    FILE = *file
+    file = fopen(filename, "r");
+    if file == NULL{
+        printf("Error opening %s", filename);
+    }
+
+    cont char separator[2] = ",";
+    char line[MAX_LINE_LENGHT];
+    long fileCurrentPosition = ftell( file );
+
+    while( fgets(line, MAX_LINE_LENGHT, file) != NULL){
+
+        char * token;
+        int tokenCount = 1;
+        int trxid, salerepid, transaction_type, amount;
+        struct transction * trans = NULL;   // empty struct, will be reinitialized for each line.
+        struct salerep * salerep = NULL;
+        token = strtok(line, separator);   // first token
+
+        while(token != NULL){
+            switch(tokenCount){
+                case 1:
+                    trxid = atoi(token);
+                    trans->trxid = trxid;
+                case 2:
+                    salerepid = atoi(token);
+                    trans->salerepid = salerepid;
+                    salerep = findSalerep(salerepid);
+                case 3:
+                    transaction_type = atoi(token);
+                    trans->type = transaction_type;
+                case 4:
+                    amount = atoi(token);
+                    trans->amount = amount;
+            }
+            token = strtok(NULL, separator);
+            tokenCount++;
+        }
+
+        // if(trans.type == 1){
+
+        // }
+    }
 
 }
-/*-----------------------------------------------------------------------------------------------------------------
-How to invoke the program:
-Project1 <maximum number of structure> <salerep input/output filename>  <transaction input filename> <territory output filename>
-<maximum number of structure> : specifies the maximum number of structure for both the salereps and the territory
-<salerep input/output filename>: filename for both input (initial amount) and output (updated at the end with the new calculated amount)
-<transaction input filename>: filename containing the transactions which must be applied
-<territory output filename>: filename to output the total per territory. 
- 
-What is already there:
--processing of the salerep filename (see processSalerepFile)
--method to update the salerep file once the processing is completed (see updateSaleRep)
 
-What you must do:
-1-you must add processing of the transaction file based on the specification in the TRANSACTION PROCESSING comment above : 60 pts
-
-2-when the processing is complete, you must update the salerep file with the latest totals (see updateSaleRep)
-
-3-you must produced an output on the console (printf) listing in descending order of amount all the territories (15 points) such as :
-territoryid, amount ex: 00001,0002000
-
-4-you must produced an output on the console (printf) listing in descending order of amount for all the salerep (10 points) such as:
-salerepid, amount ex: 0020,0007000
-
-5you must write in the file <territory filename> a file (15 points) such as: territoryid, amount, with one territory by line such as:
-territoryid, amount ex: 00001,0002000
-
--bonus : change the implementation of findSalerep to use a binary search (10 points), if the binary search is recursive (15 points)
- 
-------------------------------------------------------------------------------------------------------------------*/
 int main ( int arc, char *argv[] ) {
 
 	structCount = atoi(argv[1]); 
