@@ -81,7 +81,7 @@ struct salerep {
 struct salerep * salereps;
 struct territory * territories;
 
-int    structCount = 0;
+int structCount = 0;
 
 
 /*------------------------------------------------------------------------------------------------------------------*/
@@ -139,11 +139,62 @@ void updateSaleRep(  FILE *file, struct salerep * ptrSalerep ) {
    as it reads the file, it keeps the position at which the salerep was read from 
    for updating its data once it completes processing the file
 */   
-   
+ 
 #define MAX_LINE_LENGHT 80
+   	/*
+void processTransactionFile(char * filename){
+    FILE  *file;
+    file = fopen(filename, "r");
+    if (file == NULL){
+        printf("Error opening %s", filename);
+    }
+    const char separator[2] = ",";
+    char line[MAX_LINE_LENGHT];
+    long fileCurrentPosition = ftell( file );
+
+    while( fgets(line, MAX_LINE_LENGHT, file) != NULL){
+
+        char * token;
+        int tokenCount = 1;
+        int trxid, salerepid, transaction_type, amount;
+        struct transaction * trans = NULL;   // empty struct, will be reinitialized for each line.
+        struct salerep * salerep = NULL;
+        token = strtok(line, separator);   // first token
+
+        while(token != NULL){
+            switch(tokenCount){
+                case 1:
+                    trxid = atoi(token);
+                    trans->trxid = trxid;
+                    break;
+                case 2:
+                    salerepid = atoi(token);
+                    trans->salerepid = salerepid;
+                    salerep = findSalerep(salerepid);
+                    break;
+                case 3:
+                    transaction_type = atoi(token);
+                    trans->type = transaction_type;
+                    break;
+                case 4:
+                    amount = atoi(token);
+                    trans->amount = amount;
+                    break;
+            }
+            token = strtok(NULL, separator);
+            tokenCount++;
+        }
+
+        // if(trans.type == 1){
+
+        // }
+    }
+
+}
+*/
 void processSalerepFile( char * filename) {
 
-	/* opening file for reading */
+	
 	FILE *file;
 	
 	file = fopen(filename, "rb");
@@ -153,7 +204,7 @@ void processSalerepFile( char * filename) {
 
    char line[MAX_LINE_LENGHT];
 
-   long fileCurrentPosition = ftell( file );
+   long fileCurrentPosition = ftell(file);
 
    while ( fgets (line, MAX_LINE_LENGHT, file) !=NULL ) {
 		printf("[%s] position [%ld]\n", line, fileCurrentPosition);
@@ -163,10 +214,10 @@ void processSalerepFile( char * filename) {
 		int   tokenCount=1;
 		struct salerep * salerep = NULL;		
 
-		/* get the first token */
+		
 		token = strtok(line, separator);
    
-		/* walk through other tokens */
+		
 		int salerepid;
 		int territoryid;
 		long amount;
@@ -193,55 +244,9 @@ void processSalerepFile( char * filename) {
 	fclose(file);
 }
 
-void processTransactionFile(char * filename){
-    FILE = *file
-    file = fopen(filename, "r");
-    if file == NULL{
-        printf("Error opening %s", filename);
-    }
-
-    cont char separator[2] = ",";
-    char line[MAX_LINE_LENGHT];
-    long fileCurrentPosition = ftell( file );
-
-    while( fgets(line, MAX_LINE_LENGHT, file) != NULL){
-
-        char * token;
-        int tokenCount = 1;
-        int trxid, salerepid, transaction_type, amount;
-        struct transction * trans = NULL;   // empty struct, will be reinitialized for each line.
-        struct salerep * salerep = NULL;
-        token = strtok(line, separator);   // first token
-
-        while(token != NULL){
-            switch(tokenCount){
-                case 1:
-                    trxid = atoi(token);
-                    trans->trxid = trxid;
-                case 2:
-                    salerepid = atoi(token);
-                    trans->salerepid = salerepid;
-                    salerep = findSalerep(salerepid);
-                case 3:
-                    transaction_type = atoi(token);
-                    trans->type = transaction_type;
-                case 4:
-                    amount = atoi(token);
-                    trans->amount = amount;
-            }
-            token = strtok(NULL, separator);
-            tokenCount++;
-        }
-
-        // if(trans.type == 1){
-
-        // }
-    }
-
-}
 
 int main ( int arc, char *argv[] ) {
-
+	printf("step0 \n");
 	structCount = atoi(argv[1]); 
 
 	salereps    = (struct salerep *) malloc( sizeof(struct salerep) * structCount);
@@ -252,9 +257,17 @@ int main ( int arc, char *argv[] ) {
 		initTerritory( x, &territories[x] );
 	}
 
+	printf("step1\n");
 	char * fileName = argv[2];
-
-	processSalerepFile( fileName );
+	char * filename = argv[3];
+	printf("step2\n");
+	
+	printf("step3\n");
+	processSalerepFile(fileName);
+	printf("step4\n");
+	
+	printf("step5\n");
+	
 
 	
 	//update the salerep file with the new amount
