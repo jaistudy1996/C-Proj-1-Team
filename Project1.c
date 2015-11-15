@@ -80,6 +80,7 @@ struct salerep {
 
 struct salerep * salereps;
 struct territory * territories;
+//struct transaction * transactions;
 
 int    structCount = 0;
 
@@ -201,25 +202,36 @@ void processTransactionFile(char * filename){
     if (file == NULL){
         printf("Error opening %s", filename);
     }
-
+    printf("DEBUG: 1 :: TransactionFile\n");        // dev
     const char separator[2] = ",";
     char line[MAX_LINE_LENGHT];
     long fileCurrentPosition = ftell( file );
-
+    int inDebug = 0;        // dev
+    printf("DEBUG: 2 :: TransactionFile\n");    // dev
     while( fgets(line, MAX_LINE_LENGHT, file) != NULL){
-
+        printf("INDEBUG: 1 :: TransactionFile\n");
         char * token;
         int tokenCount = 1;
         int trxid, salerepid, transaction_type, amount;
-        struct transaction * trans = NULL;   // empty struct, will be reinitialized for each line.
+        struct transaction * trans;   // empty struct, will be reinitialized for each line.
         struct salerep * salerep = NULL;
         token = strtok(line, separator);   // first token
-
+        printf("INDEBUG: 2 :: TransactionFile\n");  // dev
         while(token != NULL){
+            printf("INDEBUG: 3 :: TransactionFile\n");  // dev
             switch(tokenCount){
                 case 1:
+                    printf("INDEBUG: 4 :: TransactionFile\n");  // dev
+                    printf("%s\n", token);
                     trxid = atoi(token);
+                    printf("%d\n", trxid);
+                    printf("INDEBUG: 5 :: TransactionFile\n");  // dev
                     trans->trxid = trxid;
+                    printf("INDEBUG: 6 :: TransactionFile\n");  // dev
+                    trxid = atoi(token);
+                    
+                    
+                    
                     break;
                 case 2:
                     salerepid = atoi(token);
@@ -238,7 +250,7 @@ void processTransactionFile(char * filename){
             token = strtok(NULL, separator);
             tokenCount++;
         }
-
+        printf("INDEBUG: 7 :: TransactionFile\n");
         if(trans->type == 1){
             territories->territoryid = salerep->territoryid;
             territories->amount += trans->amount;
@@ -276,13 +288,14 @@ void processTransactionFile(char * filename){
 
 }
 
+
 int main ( int arc, char *argv[] ) {
 
 	structCount = atoi(argv[1]); 
 
 	salereps    = (struct salerep *) malloc( sizeof(struct salerep) * structCount);
 	territories = (struct territory *) malloc( sizeof(struct territory) * structCount);
-    
+    printf("SIZE of salerep %lu\n", sizeof(salereps));
     printf("DEBUG: 1\n");
 
 	for ( int x = 0 ; x < structCount ; x++ ) {
@@ -293,7 +306,7 @@ int main ( int arc, char *argv[] ) {
     printf("DEBUG: 2\n");
 
 	char * fileName = argv[2];
-
+    processTransactionFile( argv[3]);
 	processSalerepFile( fileName );
 
     printf("DEBUG: 3\n");
@@ -311,6 +324,14 @@ int main ( int arc, char *argv[] ) {
 	
 	//sort salereps
 	qsort(salereps, structCount, sizeof(struct salerep), comparefunction);
+    qsort(territories, structCount, sizeof(struct territory), comparefunction);
+
+    for(int i = 0; i<structCount; i++){
+        printf("%d,%ld", territories[i].territoryid, territories[i].amount);
+    }
 	
+    for(int i = 0; i<structCount; i++){
+        printf("%d,%ld", salereps[i].salerepid, salereps[i].amount);
+    }
 	
 }
