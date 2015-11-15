@@ -82,7 +82,8 @@ struct salerep * salereps;
 struct territory * territories;
 //struct transaction * transactions;
 
-int    structCount = 0;
+
+int structCount = 0;
 
 
 /*------------------------------------------------------------------------------------------------------------------*/
@@ -140,11 +141,11 @@ void updateSaleRep(  FILE *file, struct salerep * ptrSalerep ) {
    as it reads the file, it keeps the position at which the salerep was read from 
    for updating its data once it completes processing the file
 */   
-   
+ 
 #define MAX_LINE_LENGHT 80
+
 void processSalerepFile( char * filename) {
 
-	/* opening file for reading */
 	FILE *file;
 	
 	file = fopen(filename, "rb");
@@ -153,8 +154,12 @@ void processSalerepFile( char * filename) {
 	}	
 
    char line[MAX_LINE_LENGHT];
-   int debug;
-   long fileCurrentPosition = ftell( file );
+
+
+   long fileCurrentPosition = ftell(file);
+
+   int debug = 0;
+   
 
    while ( fgets (line, MAX_LINE_LENGHT, file) !=NULL ) {
         printf("DEBUG SALE %d\n", debug);
@@ -166,10 +171,10 @@ void processSalerepFile( char * filename) {
 		int   tokenCount=1;
 		struct salerep * salerep = NULL;		
 
-		/* get the first token */
+		
 		token = strtok(line, separator);
    
-		/* walk through other tokens */
+		
 		int salerepid;
 		int territoryid;
 		long amount;
@@ -196,6 +201,8 @@ void processSalerepFile( char * filename) {
 	fclose(file);
 }
 
+
+
 void processTransactionFile(char * filename){
     FILE *file;
     file = fopen(filename, "r");
@@ -204,6 +211,7 @@ void processTransactionFile(char * filename){
     }
     printf("DEBUG: 1 :: TransactionFile\n");        // dev
     const char separator[2] = ",";
+    printf("DEBUG: 1 HELLO");
     char line[MAX_LINE_LENGHT];
     long fileCurrentPosition = ftell( file );
     int inDebug = 0;        // dev
@@ -227,11 +235,7 @@ void processTransactionFile(char * filename){
                     printf("%d\n", trxid);
                     printf("INDEBUG: 5 :: TransactionFile\n");  // dev
                     trans->trxid = trxid;
-                    printf("INDEBUG: 6 :: TransactionFile\n");  // dev
-                    trxid = atoi(token);
-                    
-                    
-                    
+                    printf("INDEBUG: 6 :: TransactionFile\n");  // dev                  
                     break;
                 case 2:
                     salerepid = atoi(token);
@@ -288,9 +292,13 @@ void processTransactionFile(char * filename){
 
 }
 
+void terr_add(FILE *file, struct territory * ter){
+	fprintf(file, "%d,%ld", ter->territoryid, ter->amount);
+}
+
 
 int main ( int arc, char *argv[] ) {
-
+	
 	structCount = atoi(argv[1]); 
 
 	salereps    = (struct salerep *) malloc( sizeof(struct salerep) * structCount);
@@ -306,10 +314,25 @@ int main ( int arc, char *argv[] ) {
     printf("DEBUG: 2\n");
 
 	char * fileName = argv[2];
-    processTransactionFile( argv[3]);
-	processSalerepFile( fileName );
 
     printf("DEBUG: 3\n");
+
+	char * filename = argv[4];
+
+	FILE *fptr;
+   	fptr = fopen(argv[4],"w");
+   	if(fptr==NULL){
+    	printf("Error!");
+      	exit(1);
+   }
+   	terr_add(fptr, territories);
+   	fclose(fptr);
+   	printf("%s \n", argv[3]);
+   	processTransactionFile(filename);
+   	printf("DEBUG: 3\n");
+	processSalerepFile(fileName);
+	
+
 	
 	//update the salerep file with the new amount
 	FILE * file = fopen(argv[2], "r+b");
@@ -321,7 +344,7 @@ int main ( int arc, char *argv[] ) {
 		updateSaleRep( file, &salereps[x] );
 	}
 	fclose(file);
-	
+	printf("DEBUG: 4\n");
 	//sort salereps
 	qsort(salereps, structCount, sizeof(struct salerep), comparefunction);
     qsort(territories, structCount, sizeof(struct territory), comparefunction);
@@ -330,8 +353,8 @@ int main ( int arc, char *argv[] ) {
         printf("%d,%ld", territories[i].territoryid, territories[i].amount);
     }
 	
+
     for(int i = 0; i<structCount; i++){
         printf("%d,%ld", salereps[i].salerepid, salereps[i].amount);
     }
-	
 }
