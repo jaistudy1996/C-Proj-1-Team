@@ -254,7 +254,7 @@ void processTransactionFile(char * filename){
             token = strtok(NULL, separator);
             tokenCount++;
         }
-        printf("INDEBUG: 7 :: TransactionFile\n");
+        printf("INDEBUG: 7 :: TransactionFile\n");  // dev
         if(trans->type == 1){
             territories->territoryid = salerep->territoryid;
             territories->amount += trans->amount;
@@ -350,11 +350,11 @@ int main ( int arc, char *argv[] ) {
     qsort(territories, structCount, sizeof(struct territory), comparefunction);
 
     for(int i = 0; i<structCount; i++){
-        printf("%d,%ld", territories[i].territoryid, territories[i].amount);
+        printf("%d,%ld\n", territories[i].territoryid, territories[i].amount);
     }
 	
 
     for(int i = 0; i<structCount; i++){
-        printf("%d,%ld", salereps[i].salerepid, salereps[i].amount);
+        printf("%d,%ld\n", salereps[i].salerepid, salereps[i].amount);
     }
 }
