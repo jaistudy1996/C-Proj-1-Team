@@ -152,10 +152,12 @@ void processSalerepFile( char * filename) {
 	}	
 
    char line[MAX_LINE_LENGHT];
-
+   int debug;
    long fileCurrentPosition = ftell( file );
 
    while ( fgets (line, MAX_LINE_LENGHT, file) !=NULL ) {
+        printf("DEBUG SALE %d\n", debug);
+        debug++;
 		printf("[%s] position [%ld]\n", line, fileCurrentPosition);
 		
 		const char separator[2] = ",";
@@ -194,13 +196,13 @@ void processSalerepFile( char * filename) {
 }
 
 void processTransactionFile(char * filename){
-    FILE = *file
+    FILE *file;
     file = fopen(filename, "r");
-    if file == NULL{
+    if (file == NULL){
         printf("Error opening %s", filename);
     }
 
-    cont char separator[2] = ",";
+    const char separator[2] = ",";
     char line[MAX_LINE_LENGHT];
     long fileCurrentPosition = ftell( file );
 
@@ -209,7 +211,7 @@ void processTransactionFile(char * filename){
         char * token;
         int tokenCount = 1;
         int trxid, salerepid, transaction_type, amount;
-        struct transction * trans = NULL;   // empty struct, will be reinitialized for each line.
+        struct transaction * trans = NULL;   // empty struct, will be reinitialized for each line.
         struct salerep * salerep = NULL;
         token = strtok(line, separator);   // first token
 
@@ -218,24 +220,58 @@ void processTransactionFile(char * filename){
                 case 1:
                     trxid = atoi(token);
                     trans->trxid = trxid;
+                    break;
                 case 2:
                     salerepid = atoi(token);
                     trans->salerepid = salerepid;
                     salerep = findSalerep(salerepid);
+                    break;
                 case 3:
                     transaction_type = atoi(token);
                     trans->type = transaction_type;
+                    break;
                 case 4:
                     amount = atoi(token);
                     trans->amount = amount;
+                    break;
             }
             token = strtok(NULL, separator);
             tokenCount++;
         }
 
-        // if(trans.type == 1){
-
-        // }
+        if(trans->type == 1){
+            territories->territoryid = salerep->territoryid;
+            territories->amount += trans->amount;
+            salerep->amount += trans->amount;
+        }
+        if(trans->type == 2){
+            territories->territoryid = salerep->territoryid;
+            territories->amount += trans->amount;
+            salerep->amount += (110 / 100) * (trans->amount);
+        }
+        if(trans->type == 3){
+            territories->territoryid = salerep->territoryid;
+            territories->amount -= trans->amount;
+            salerep->amount -= trans->amount;
+        }
+        if(trans->type == 4){
+            territories->territoryid = salerep->territoryid;
+            territories->amount -= trans->amount;
+            salerep->amount -= (125 / 100) * trans->amount;
+        }
+        if(trans->type == 5){
+            territories->territoryid = salerep->territoryid;
+            territories->amount -= trans->amount;
+        }
+        if(trans->type == 6){
+            territories->territoryid = salerep->territoryid;
+            territories->amount -= trans->amount;
+            salerep->amount -= (110 / 100) * trans->amount;
+        }
+        if(trans->type == 7){
+            territories->territoryid = salerep->territoryid;
+            salerep->amount += (75 / 100) * trans->amount;
+        }
     }
 
 }
@@ -247,15 +283,20 @@ int main ( int arc, char *argv[] ) {
 	salereps    = (struct salerep *) malloc( sizeof(struct salerep) * structCount);
 	territories = (struct territory *) malloc( sizeof(struct territory) * structCount);
     
+    printf("DEBUG: 1\n");
+
 	for ( int x = 0 ; x < structCount ; x++ ) {
 		initSaleRep( x, &salereps[x] );
 		initTerritory( x, &territories[x] );
 	}
 
+    printf("DEBUG: 2\n");
+
 	char * fileName = argv[2];
 
 	processSalerepFile( fileName );
 
+    printf("DEBUG: 3\n");
 	
 	//update the salerep file with the new amount
 	FILE * file = fopen(argv[2], "r+b");
